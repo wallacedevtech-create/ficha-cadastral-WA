@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA Assessoria — Ficha Digital de Cadastro de Cliente</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jsPDF & html2canvas Library CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            950: '#040711',
+                            900: '#0a0f1d',
+                            800: '#12192c',
+                            700: '#1b243b'
+                        },
+                        gold: {
+                            300: '#f9e8a2',
+                            400: '#e6c86e',
+                            500: '#d4af37',
+                            600: '#aa8822',
+                            700: '#7a6012'
+                        },
+                        grafite: {
+                            800: '#161b26',
+                            700: '#1e2536',
+                            600: '#2a344a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'Montserrat', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Metallic Gold Gradients */
+        body {
+            background-image: url(/wa-hero-mobile.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+            color: #e2e8f0;
+            
+            background-attachment: fixed;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fff2bc 0%, #d4af37 50%, #aa8822 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #e6c86e 0%, #d4af37 50%, #997715 100%);
+        }
+
+        .gold-gradient-bg:hover {
+            background: linear-gradient(135deg, #f9e8a2 0%, #e6c86e 50%, #b89327 100%);
+        }
+
+        .gold-border {
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .gold-border-glow:focus-within, .gold-border-glow:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+        }
+
+        .card-glass {
+            background: rgba(22, 27, 38, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        /* Input Custom Styling */
+        input, select, textarea {
+            background-color: #1e2536 !important;
+            color: #ffffff !important;
+            border: 1px solid #2a344a;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #d4af37 !important;
+            outline: none;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2) !important;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #64748b;
+        }
+
+        /* Toggle Button Custom Animations */
+        .toggle-btn-active {
+            background: linear-gradient(135deg, #d4af37 0%, #aa8822 100%);
+            color: #040711;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Smooth Loader */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #d4af37;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #040711;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2536;
+            border-radius: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen pb-12 flex flex-col justify-between">
+
+    <!-- TOP BAR / BRAND HEADER -->
+    <header class="w-full border-b border-navy-700 bg-navy-900/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Logotipo WA Estilizado -->
+                <div class="w-12 h-12 rounded-xl logo flex items-center justify-center font-heading font-extrabold text-navy-950 text-xl tracking-wider shadow-lg" style="background: transparent;">
+                    <img src="wa-logo-removebg-preview.png" alt="">
+                </div>
+                <div>
+                    <span class="text-xs text-gold-400 font-medium tracking-widest uppercase">Assessoria & Soluções</span>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-400 bg-navy-800/80 px-3 py-1.5 rounded-full border border-navy-700">
+                <i class="fas me-1 fa-shield-halved text-gold-500"></i>
+                <span>Ambiente Criptografado</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-4xl mx-auto px-4 pt-8 w-full">
+        
+        <!-- APRESENTAÇÃO E BOAS-VINDAS -->
+        <section class="mb-8 text-center sm:text-left card-glass rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-gold-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="space-y-3 max-w-2xl">
+                    <span class="inline-block px-3 py-1 bg-gold-500/10 text-gold-400 border border-gold-500/20 text-xs font-semibold rounded-full uppercase tracking-wider">
+                        Ficha Digital Cadastral
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-heading font-bold text-white">
+                        Seja bem-vindo à <span class="gold-gradient-text">WA Assessoria</span>
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Para iniciarmos seu atendimento com eficiência e exclusividade, pedimos a gentileza de preencher seus dados cadastrais abaixo. As informações serão utilizadas para identificar você e organizar seus processos.
+                    </p>
+                </div>
+                <!-- Badge de Segurança -->
+                <div class="flex flex-col items-center justify-center bg-navy-950/60 p-4 rounded-xl border border-navy-700 text-center min-w-[180px]">
+                    <div class="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-400 mb-2">
+                        <i class="fas fa-bolt text-lg"></i>
+                    </div>
+                    <span class="text-xs font-semibold text-white">Preenchimento Rápido</span>
+                    <span class="text-[11px] text-slate-400 mt-0.5">Leve menos de 2 min</span>
+                    <span class="text-[10px] text-gold-400/90 mt-2 flex items-center gap-1 font-medium">
+                        <i class="fas fa-lock text-[9px]"></i> 100% Conforme LGPD
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORMULÁRIO PRINCIPAL -->
+        <form id="cadForm" onsubmit="event.preventDefault(); processarEnvio();" class="space-y-8" novalidate>
+            
+            <!-- TIPO DE PESSOA (TOGGLE) -->
+            <section class="card-glass rounded-2xl p-6 sm:p-8 shadow-xl">
+                <label class="block text-sm font-semibold text-gold-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fas fa-user-tag"></i> Tipo de Perfil Cadastral
+                </label>
+                <div class="grid grid-cols-2 gap-3 p-1.5 bg-navy-950 rounded-xl border border-navy-700">
+                    <button type="button" id="btnPF" onclick="setTipoPessoa('PF')" class="py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 toggle-btn-active">
+                        <i class="fas fa-user"></i> Pessoa Física (PF)
+                    </button>
+                    <button type="button" id="btnPJ" onclick="setTipoPessoa('PJ')" class="py-3 px-4 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-building"></i> Pessoa Jurídica (PJ)
+                    </button>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 1: IDENTIFICAÇÃO PESSOAL / JURÍDICA -->
+            <section class="card-glass rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <div class="border-b border-navy-700 pb-3 flex items-center justify-between">
+                    <h3 class="text-lg font-heading font-semibold text-white flex items-center gap-2">
+                        <i class="fas fa-id-card text-gold-400"></i>
+                        <span id="sec1Title">Dados de Identificação (Pessoa Física)</span>
+                    </h3>
+                    <span class="text-xs text-slate-400">* Campos obrigatórios</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    
+                    <!-- Nome / Razão Social -->
+                    <div class="md:col-span-2">
+                        <label id="lblNome" for="nomeRazao" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Nome Completo *
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="nomeRazao" name="nomeRazao" required placeholder="Ex: Carlos Eduardo da Silva" class="w-full px-4 py-3 rounded-xl text-sm focus:ring-1 focus:ring-gold-500">
+                        </div>
+                        <span id="err-nomeRazao" class="text-red-400 text-xs hidden mt-1">Por favor, informe seu nome completo ou razão social.</span>
+                    </div>
+
+                    <!-- CPF / CNPJ -->
+                    <div>
+                        <label id="lblCpfCnpj" for="cpfCnpj" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            CPF *
+                        </label>
+                        <input type="text" id="cpfCnpj" name="cpfCnpj" required placeholder="000.000.000-00" maxlength="18" oninput="aplicarMascaraDocumento(this)" onblur="validarDocumentoAsync()" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-cpfCnpj" class="text-red-400 text-xs hidden mt-1">CPF inválido. Verifique os números digitados.</span>
+                    </div>
+
+                    <!-- Data Nasc / Abertura -->
+                    <div>
+                        <label id="lblData" for="dataNascAbertura" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Data de Nascimento *
+                        </label>
+                        <input type="date" id="dataNascAbertura" name="dataNascAbertura" required class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-dataNascAbertura" class="text-red-400 text-xs hidden mt-1">Informe uma data válida.</span>
+                    </div>
+
+                    <!-- CAMPOS EXCLUSIVOS PJ (Ocultos por padrão) -->
+                    <div id="boxNomeFantasia" class="hidden">
+                        <label for="nomeFantasia" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Nome Fantasia
+                        </label>
+                        <input type="text" id="nomeFantasia" name="nomeFantasia" placeholder="Ex: WA Tecnologia" class="w-full px-4 py-3 rounded-xl text-sm">
+                    </div>
+
+                    <div id="boxRepresentante" class="hidden">
+                        <label for="repLegal" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Nome do Representante Legal *
+                        </label>
+                        <input type="text" id="repLegal" name="repLegal" placeholder="Nome do sócio / responsável" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-repLegal" class="text-red-400 text-xs hidden mt-1">Informe o nome do representante legal.</span>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SEÇÃO 2: CONTATO -->
+            <section class="card-glass rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <div class="border-b border-navy-700 pb-3">
+                    <h3 class="text-lg font-heading font-semibold text-white flex items-center gap-2">
+                        <i class="fas fa-address-book text-gold-400"></i> Informações de Contato
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    
+                    <!-- WhatsApp -->
+                    <div>
+                        <label for="whatsapp" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            WhatsApp (Principal) *
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="whatsapp" name="whatsapp" required placeholder="(00) 90000-0000" maxlength="15" oninput="mascaraTelefone(this)" class="w-full px-4 py-3 rounded-xl text-sm">
+                            <span class="absolute right-3 top-3 text-emerald-500"><i class="fab fa-whatsapp text-lg"></i></span>
+                        </div>
+                        <span id="err-whatsapp" class="text-red-400 text-xs hidden mt-1">Informe um número de WhatsApp válido.</span>
+                    </div>
+
+                    <!-- Telefone Secundário -->
+                    <div>
+                        <label for="telefoneSec" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Telefone Fixo / Secundário (Opcional)
+                        </label>
+                        <input type="text" id="telefoneSec" name="telefoneSec" placeholder="(00) 0000-0000" maxlength="15" oninput="mascaraTelefone(this)" class="w-full px-4 py-3 rounded-xl text-sm">
+                    </div>
+
+                    <!-- E-mail -->
+                    <div class="md:col-span-2">
+                        <label for="email" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            E-mail Corporativo ou Pessoal *
+                        </label>
+                        <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-email" class="text-red-400 text-xs hidden mt-1">Informe um endereço de e-mail válido.</span>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SEÇÃO 3: ENDEREÇO -->
+            <section class="card-glass rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <div class="border-b border-navy-700 pb-3 flex items-center justify-between">
+                    <h3 class="text-lg font-heading font-semibold text-white flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt text-gold-400"></i> Endereço Completo
+                    </h3>
+                    <span class="text-xs text-gold-400/80">Busca automática por CEP</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    
+                    <!-- CEP -->
+                    <div>
+                        <label for="cep" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            CEP *
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="cep" name="cep" required placeholder="00000-000" maxlength="9" oninput="mascaraCEP(this)" onblur="buscarCEP()" class="w-full px-4 py-3 rounded-xl text-sm">
+                            <div id="cepSpinner" class="absolute right-3 top-3 hidden">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <span id="err-cep" class="text-red-400 text-xs hidden mt-1">CEP não encontrado ou inválido.</span>
+                    </div>
+
+                    <!-- Estado (UF) -->
+                    <div>
+                        <label for="uf" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Estado (UF) *
+                        </label>
+                        <select id="uf" name="uf" required class="w-full px-4 py-3 rounded-xl text-sm">
+                            <option value="">Selecione...</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Aapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                        <span id="err-uf" class="text-red-400 text-xs hidden mt-1">Selecione o Estado.</span>
+                    </div>
+
+                    <!-- Cidade -->
+                    <div>
+                        <label for="cidade" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Cidade *
+                        </label>
+                        <input type="text" id="cidade" name="cidade" required placeholder="Cidade" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-cidade" class="text-red-400 text-xs hidden mt-1">Informe a cidade.</span>
+                    </div>
+
+                    <!-- Bairro -->
+                    <div>
+                        <label for="bairro" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Bairro *
+                        </label>
+                        <input type="text" id="bairro" name="bairro" required placeholder="Bairro" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-bairro" class="text-red-400 text-xs hidden mt-1">Informe o bairro.</span>
+                    </div>
+
+                    <!-- Rua / Logradouro -->
+                    <div class="md:col-span-2">
+                        <label for="rua" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Rua / Avenida *
+                        </label>
+                        <input type="text" id="rua" name="rua" required placeholder="Nome do logradouro" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-rua" class="text-red-400 text-xs hidden mt-1">Informe a rua ou avenida.</span>
+                    </div>
+
+                    <!-- Número -->
+                    <div>
+                        <label for="numero" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Número *
+                        </label>
+                        <input type="text" id="numero" name="numero" required placeholder="Ex: 125" class="w-full px-4 py-3 rounded-xl text-sm">
+                        <span id="err-numero" class="text-red-400 text-xs hidden mt-1">Informe o número.</span>
+                    </div>
+
+                    <!-- Complemento -->
+                    <div class="md:col-span-2">
+                        <label for="complemento" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Complemento (Opcional)
+                        </label>
+                        <input type="text" id="complemento" name="complemento" placeholder="Ex: Bloco B, Apt 42" class="w-full px-4 py-3 rounded-xl text-sm">
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SEÇÃO 4: INFORMAÇÕES ADICIONAIS -->
+            <section class="card-glass rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <div class="border-b border-navy-700 pb-3">
+                    <h3 class="text-lg font-heading font-semibold text-white flex items-center gap-2">
+                        <i class="fas fa-info-circle text-gold-400"></i> Informações Adicionais
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="comoConheceu" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Como conheceu a WA Assessoria?
+                        </label>
+                        <select id="comoConheceu" name="comoConheceu" class="w-full px-4 py-3 rounded-xl text-sm">
+                            <option value="Indicação">Indicação de Cliente / Amigo</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Google / Pesquisa">Google / Pesquisa Web</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="WhatsApp">Mensagem / WhatsApp</option>
+                            <option value="Outro">Outro Canal</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="observacoes" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                            Observações ou Necessidades Específicas (Opcional)
+                        </label>
+                        <textarea id="observacoes" name="observacoes" rows="3" placeholder="Descreva sucintamente o tipo de apoio ou gestão que você necessita..." class="w-full px-4 py-3 rounded-xl text-sm"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 5: PRIVACIDADE & LGPD -->
+            <section class="card-glass rounded-2xl p-6 sm:p-8 shadow-xl space-y-4 border border-gold-500/20">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-shield-cat text-base"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-white">Declaração de Privacidade e Segurança (LGPD)</h4>
+                        <p class="text-xs text-slate-300 leading-relaxed mt-1">
+                            Os seus dados pessoais serão utilizados exclusivamente para formalização de cadastro, identificação, contato e organização dos serviços prestados pela <strong>WA Assessoria</strong>. Respeitamos a sua privacidade e não compartilhamos suas informações com terceiros não autorizados.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Aviso de Não Solicitação de Senhas -->
+                <div class="p-3 bg-navy-950/80 rounded-xl border border-navy-700 flex items-center gap-3 text-xs text-amber-300/90">
+                    <i class="fas fa-exclamation-triangle text-amber-400 text-sm shrink-0"></i>
+                    <span><strong>Aviso de Segurança:</strong> A WA Assessoria NUNCA solicita senhas bancárias, senhas de acesso do GOV.BR ou códigos de autenticação de SMS/WhatsApp.</span>
+                </div>
+
+                <!-- Checkbox LGPD -->
+                <div class="pt-2">
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input type="checkbox" id="aceitoLGPD" required class="mt-1 w-4 h-4 text-gold-500 rounded border-slate-700 focus:ring-gold-500 focus:ring-offset-navy-900">
+                        <span class="text-xs text-slate-300 group-hover:text-white transition-colors">
+                            Declaro que li e concordo com o tratamento dos meus dados pessoais fornecidos nesta ficha para fins de cadastro e atendimento junto à WA Assessoria, conforme disposto na Lei Geral de Proteção de Dados (Lei nº 13.709/2018). *
+                        </span>
+                    </label>
+                    <span id="err-aceitoLGPD" class="text-red-400 text-xs hidden mt-1 block">É obrigatório aceitar os termos de privacidade para continuar.</span>
+                </div>
+            </section>
+
+            <!-- BOTÃO DE AÇÃO / ENVIO -->
+            <div class="pt-4 text-center">
+                <button type="submit" id="btnSubmit" class="w-full sm:w-auto min-w-[320px] px-8 py-4 rounded-xl gold-gradient-bg text-navy-950 font-heading font-bold text-base tracking-wide uppercase shadow-xl hover:shadow-gold-500/20 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 mx-auto">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    <span>ENVIAR MEU CADASTRO</span>
+                </button>
+                <p class="text-xs text-slate-400 mt-3">
+                    Ao clicar, seu documento PDF será gerado automaticamente e você será direcionado ao WhatsApp da WA Assessoria.
+                </p>
+            </div>
+
+        </form>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 border-t border-navy-800 bg-navy-950 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-4xl mx-auto px-4 space-y-2">
+            <p>© <span id="currentYear"></span> WA Assessoria — Todos os direitos reservados.</p>
+            <p class="text-[11px] text-slate-600">Sistema Seguro de Cadastramento Digital de Clientes • Processamento Local Direto</p>
+        </div>
+    </footer>
+
+    <!-- MODAL DE CONFIRMAÇÃO & INSTRUÇÃO WHATSAPP -->
+    <div id="modalConfirmacao" class="fixed inset-0 bg-navy-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="card-glass max-w-lg w-full rounded-2xl p-6 sm:p-8 shadow-2xl border border-gold-500/30 text-center space-y-6 relative transform transition-all">
+            
+            <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-3xl">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xl font-heading font-bold text-white">Ficha Gerada com Sucesso!</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Seu cadastro foi preparado e o arquivo <strong id="modalFileName" class="text-gold-400">Ficha_Cadastro.pdf</strong> foi baixado em seu dispositivo.
+                </p>
+            </div>
+
+            <div class="bg-navy-900/90 rounded-xl p-4 border border-navy-700 text-left space-y-3">
+                <span class="text-xs font-semibold text-gold-400 uppercase tracking-wider block">Passo Final para Conclusão:</span>
+                <ol class="text-xs text-slate-300 space-y-2 list-decimal list-inside">
+                    <li>Sua conversa de WhatsApp com a <strong>WA Assessoria</strong> foi aberta em outra aba.</li>
+                    <li>No WhatsApp, clique no ícone de <strong>anexo <i class="fas fa-paperclip text-slate-400"></i></strong>.</li>
+                    <li>Selecione o arquivo PDF recém-baixado (localizado na sua pasta de Download).</li>
+                    <li>Envie a mensagem e o PDF para nossa equipe confirmar o recebimento!</li>
+                </ol>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                <button type="button" onclick="reabrirWhatsApp()" class="flex-1 py-3 px-4 rounded-xl gold-gradient-bg text-navy-950 font-bold text-sm flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-lg"></i> Abrir WhatsApp Novamente
+                </button>
+                <button type="button" onclick="fecharModal()" class="py-3 px-4 rounded-xl bg-navy-800 text-slate-300 hover:text-white text-sm font-semibold border border-navy-700">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE REGRAS DE NEGÓCIO, VALIDAÇÃO E GERAÇÃO PDF -->
+    <script>
+        /**
+         * CONFIGURAÇÃO PRINCIPAL
+         * Número de atendimento WhatsApp da WA Assessoria em formato internacional (sem + ou traços)
+         */
+        const WA_GESTAO_NUMBER = "5564993286584"; 
+
+        // Variável de estado global
+        let tipoPessoa = 'PF'; // 'PF' ou 'PJ'
+        let pdfUltimaMensagemWa = '';
+        let pdfUltimoNomeArquivo = '';
+
+        // Definir ano atual no footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        /**
+         * Alterna entre Pessoa Física e Jurídica na interface
+         */
+        function setTipoPessoa(tipo) {
+            tipoPessoa = tipo;
+            const btnPF = document.getElementById('btnPF');
+            const btnPJ = document.getElementById('btnPJ');
+            
+            const sec1Title = document.getElementById('sec1Title');
+            const lblNome = document.getElementById('lblNome');
+            const nomeRazao = document.getElementById('nomeRazao');
+            const lblCpfCnpj = document.getElementById('lblCpfCnpj');
+            const cpfCnpj = document.getElementById('cpfCnpj');
+            const lblData = document.getElementById('lblData');
+            
+            const boxNomeFantasia = document.getElementById('boxNomeFantasia');
+            const boxRepresentante = document.getElementById('boxRepresentante');
+
+            // Limpa máscaras e erros
+            cpfCnpj.value = '';
+            esconderErro('cpfCnpj');
+
+            if (tipo === 'PF') {
+                btnPF.className = "py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 toggle-btn-active";
+                btnPJ.className = "py-3 px-4 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2";
+                
+                sec1Title.textContent = "Dados de Identificação (Pessoa Física)";
+                lblNome.textContent = "Nome Completo *";
+                nomeRazao.placeholder = "Ex: Carlos Eduardo da Silva";
+                lblCpfCnpj.textContent = "CPF *";
+                cpfCnpj.placeholder = "000.000.000-00";
+                cpfCnpj.maxLength = 14;
+                lblData.textContent = "Data de Nascimento *";
+                
+                boxNomeFantasia.classList.add('hidden');
+                boxRepresentante.classList.add('hidden');
+                document.getElementById('repLegal').required = false;
+            } else {
+                btnPJ.className = "py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 toggle-btn-active";
+                btnPF.className = "py-3 px-4 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-all duration-300 flex items-center justify-center gap-2";
+                
+                sec1Title.textContent = "Dados de Identificação (Pessoa Jurídica)";
+                lblNome.textContent = "Razão Social *";
+                nomeRazao.placeholder = "Ex: WA Assessoria Empresarial LTDA";
+                lblCpfCnpj.textContent = "CNPJ *";
+                cpfCnpj.placeholder = "00.000.000/0000-00";
+                cpfCnpj.maxLength = 18;
+                lblData.textContent = "Data de Abertura da Empresa *";
+                
+                boxNomeFantasia.classList.remove('hidden');
+                boxRepresentante.classList.remove('hidden');
+                document.getElementById('repLegal').required = true;
+            }
+        }
+
+        /**
+         * MÁSCARAS DE ENTRADA (Input Masking)
+         */
+        function aplicarMascaraDocumento(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (tipoPessoa === 'PF') {
+                v = v.substring(0, 11);
+                v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            } else {
+                v = v.substring(0, 14);
+                v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+                v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+                v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+                v = v.replace(/(\d{4})(\d)/, '$1-$2');
+            }
+            input.value = v;
+        }
+
+        function mascaraTelefone(input) {
+            let v = input.value.replace(/\D/g, '');
+            v = v.substring(0, 11);
+            if (v.length > 10) {
+                v = v.replace(/^(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else if (v.length > 5) {
+                v = v.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            } else if (v.length > 2) {
+                v = v.replace(/^(\d\d)(\d{0,5})/, '($1) $2');
+            }
+            input.value = v;
+        }
+
+        function mascaraCEP(input) {
+            let v = input.value.replace(/\D/g, '');
+            v = v.substring(0, 8);
+            v = v.replace(/^(\d{5})(\d)/, '$1-$2');
+            input.value = v;
+        }
+
+        /**
+         * ALGORITMOS DE VALIDAÇÃO MATEMÁTICA (CPF E CNPJ REAL)
+         */
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+            let add = 0;
+            for (let i = 0; i < 9; i++) add += parseInt(cpf.charAt(i)) * (10 - i);
+            let rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(9))) return false;
+            add = 0;
+            for (let i = 0; i < 10; i++) add += parseInt(cpf.charAt(i)) * (11 - i);
+            rev = 11 - (add % 11);
+            if (rev === 10 || rev === 11) rev = 0;
+            if (rev !== parseInt(cpf.charAt(10))) return false;
+            return true;
+        }
+
+        function validarCNPJ(cnpj) {
+            cnpj = cnpj.replace(/[^\d]+/g, '');
+            if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
+            let tamanho = cnpj.length - 2;
+            let numeros = cnpj.substring(0, tamanho);
+            let digitos = cnpj.substring(tamanho);
+            let soma = 0;
+            let pos = tamanho - 7;
+            for (let i = tamanho; i >= 1; i--) {
+                soma += numeros.charAt(tamanho - i) * pos--;
+                if (pos < 2) pos = 9;
+            }
+            let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+            if (resultado != digitos.charAt(0)) return false;
+            tamanho = tamanho + 1;
+            numeros = cnpj.substring(0, tamanho);
+            soma = 0;
+            pos = tamanho - 7;
+            for (let i = tamanho; i >= 1; i--) {
+                soma += numeros.charAt(tamanho - i) * pos--;
+                if (pos < 2) pos = 9;
+            }
+            resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+            if (resultado != digitos.charAt(1)) return false;
+            return true;
+        }
+
+        function validarDocumentoAsync() {
+            const input = document.getElementById('cpfCnpj');
+            const valor = input.value.trim();
+            if (!valor) return;
+
+            let valido = tipoPessoa === 'PF' ? validarCPF(valor) : validarCNPJ(valor);
+            if (!valido) {
+                mostrarErro('cpfCnpj', `${tipoPessoa === 'PF' ? 'CPF' : 'CNPJ'} inválido. Verifique os números.`);
+            } else {
+                esconderErro('cpfCnpj');
+            }
+            return valido;
+        }
+
+        /**
+         * BUSCA AUTOMÁTICA DE CEP (ViaCEP API)
+         */
+        async function buscarCEP() {
+            const cepInput = document.getElementById('cep');
+            const cep = cepInput.value.replace(/\D/g, '');
+            const spinner = document.getElementById('cepSpinner');
+
+            if (cep.length !== 8) return;
+
+            spinner.classList.remove('hidden');
+            esconderErro('cep');
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+
+                if (data.erro) {
+                    mostrarErro('cep', 'CEP não encontrado.');
+                } else {
+                    document.getElementById('rua').value = data.logradouro || '';
+                    document.getElementById('bairro').value = data.bairro || '';
+                    document.getElementById('cidade').value = data.localidade || '';
+                    document.getElementById('uf').value = data.uf || '';
+                    document.getElementById('numero').focus();
+                }
+            } catch (err) {
+                mostrarErro('cep', 'Erro ao consultar CEP. Preencha manualmente.');
+            } finally {
+                spinner.classList.add('hidden');
+            }
+        }
+
+        /**
+         * MENSAGENS DE ERRO E VALIDAÇÃO DE CAMPOS
+         */
+        function mostrarErro(fieldId, msg) {
+            const errSpan = document.getElementById(`err-${fieldId}`);
+            if (errSpan) {
+                if (msg) errSpan.textContent = msg;
+                errSpan.classList.remove('hidden');
+            }
+            const inputEl = document.getElementById(fieldId);
+            if (inputEl) {
+                inputEl.classList.add('border-red-500');
+            }
+        }
+
+        function esconderErro(fieldId) {
+            const errSpan = document.getElementById(`err-${fieldId}`);
+            if (errSpan) errSpan.classList.add('hidden');
+            const inputEl = document.getElementById(fieldId);
+            if (inputEl) {
+                inputEl.classList.remove('border-red-500');
+            }
+        }
+
+        function validarFormulario() {
+            let valido = true;
+
+            // Nome / Razão Social
+            const nomeRazao = document.getElementById('nomeRazao').value.trim();
+            if (nomeRazao.length < 3) {
+                mostrarErro('nomeRazao', 'Informe seu nome completo ou razão social.');
+                valido = false;
+            } else {
+                esconderErro('nomeRazao');
+            }
+
+            // CPF / CNPJ
+            const docValido = validarDocumentoAsync();
+            if (!docValido) valido = false;
+
+            // Data
+            const dataVal = document.getElementById('dataNascAbertura').value;
+            if (!dataVal) {
+                mostrarErro('dataNascAbertura', 'Informe a data correspondente.');
+                valido = false;
+            } else {
+                esconderErro('dataNascAbertura');
+            }
+
+            // Representante Legal se PJ
+            if (tipoPessoa === 'PJ') {
+                const rep = document.getElementById('repLegal').value.trim();
+                if (rep.length < 3) {
+                    mostrarErro('repLegal', 'Informe o nome do representante legal.');
+                    valido = false;
+                } else {
+                    esconderErro('repLegal');
+                }
+            }
+
+            // WhatsApp
+            const wa = document.getElementById('whatsapp').value.replace(/\D/g, '');
+            if (wa.length < 10) {
+                mostrarErro('whatsapp', 'Informe um WhatsApp com DDD válido.');
+                valido = false;
+            } else {
+                esconderErro('whatsapp');
+            }
+
+            // Email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                mostrarErro('email', 'Informe um endereço de e-mail válido.');
+                valido = false;
+            } else {
+                esconderErro('email');
+            }
+
+            // Endereço
+            ['cep', 'uf', 'cidade', 'bairro', 'rua', 'numero'].forEach(field => {
+                const el = document.getElementById(field);
+                if (!el.value.trim()) {
+                    mostrarErro(field, 'Campo obrigatório.');
+                    valido = false;
+                } else {
+                    esconderErro(field);
+                }
+            });
+
+            // LGPD Checkbox
+            const lgpd = document.getElementById('aceitoLGPD').checked;
+            if (!lgpd) {
+                mostrarErro('aceitoLGPD');
+                valido = false;
+            } else {
+                esconderErro('aceitoLGPD');
+            }
+
+            return valido;
+        }
+
+        /**
+         * GERAÇÃO DO PDF ELEGANTE (A4 PROFISSIONAL DA WA Assessoria)
+         */
+        async function gerarPDF(dados) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const dataAtual = new Date();
+            const dataStr = dataAtual.toLocaleDateString('pt-BR');
+            const horaStr = dataAtual.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            // PALETA DE CORES DO PDF (Fundo Elegante Azul-Escuro Executivo)
+            const bgNavy = [10, 15, 29];
+            const bgCard = [22, 27, 38];
+            const textWhite = [255, 255, 255];
+            const textGold = [212, 175, 55];
+            const textSlate = [148, 163, 184];
+
+            // Fundo da Página Inteira
+            doc.setFillColor(...bgNavy);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            // CABEÇALHO DO PDF
+            doc.setFillColor(...bgCard);
+            doc.rect(0, 0, 210, 38, 'F');
+
+            // Linha decorativa dourada
+            doc.setFillColor(...textGold);
+            doc.rect(0, 37, 210, 1, 'F');
+
+            // Logo Simbolizada "WA"
+            doc.setFillColor(...textGold);
+            doc.roundedRect(14, 8, 18, 22, 3, 3, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(...bgNavy);
+            doc.text("WA", 23, 22, { align: "center" });
+
+            // Título WA Assessoria
+            doc.setFontSize(16);
+            doc.setTextColor(...textWhite);
+            doc.text("WA Assessoria ASSESSORIA EMPRESARIAL", 36, 17);
+            
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...textGold);
+            doc.text("FICHA DE CADASTRO OFICIAL DE CLIENTE", 36, 24);
+
+            doc.setTextColor(...textSlate);
+            doc.setFontSize(8);
+            doc.text(`Data do Cadastro: ${dataStr} às ${horaStr}`, 196, 24, { align: "right" });
+
+            let y = 48;
+
+            // Função Auxiliar para Seções no PDF
+            function desenharSecao(titulo, icone) {
+                doc.setFillColor(27, 36, 59);
+                doc.roundedRect(14, y, 182, 8, 2, 2, 'F');
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(...textGold);
+                doc.text(titulo.toUpperCase(), 18, y + 5.5);
+                y += 13;
+            }
+
+            // SEÇÃO 1: PERFIL & DADOS
+            desenharSecao("1. Identificação do Cliente");
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            
+            const col1 = 18;
+            const col2 = 110;
+
+            doc.setTextColor(...textSlate); doc.text("Tipo de Perfil:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.tipoPessoa === 'PF' ? 'Pessoa Física (PF)' : 'Pessoa Jurídica (PJ)', col1 + 35, y);
+
+            y += 6;
+            doc.setTextColor(...textSlate); doc.text(dados.tipoPessoa === 'PF' ? "Nome Completo:" : "Razão Social:", col1, y);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...textWhite); doc.text(dados.nomeRazao, col1 + (dados.tipoPessoa === 'PF' ? 35 : 30), y);
+
+            y += 6;
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...textSlate); doc.text(dados.tipoPessoa === 'PF' ? "CPF:" : "CNPJ:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.cpfCnpj, col1 + 15, y);
+
+            doc.setTextColor(...textSlate); doc.text(dados.tipoPessoa === 'PF' ? "Data Nasc.:" : "Data Abertura:", col2, y);
+            doc.setTextColor(...textWhite); doc.text(formatarDataBR(dados.dataNascAbertura), col2 + 28, y);
+
+            if (dados.tipoPessoa === 'PJ') {
+                if (dados.nomeFantasia) {
+                    y += 6;
+                    doc.setTextColor(...textSlate); doc.text("Nome Fantasia:", col1, y);
+                    doc.setTextColor(...textWhite); doc.text(dados.nomeFantasia, col1 + 30, y);
+                }
+                y += 6;
+                doc.setTextColor(...textSlate); doc.text("Representante Legal:", col1, y);
+                doc.setTextColor(...textWhite); doc.text(dados.repLegal, col1 + 38, y);
+            }
+
+            y += 12;
+
+            // SEÇÃO 2: CONTATO
+            desenharSecao("2. Informações de Contato");
+
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...textSlate); doc.text("WhatsApp:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.whatsapp, col1 + 22, y);
+
+            if (dados.telefoneSec) {
+                doc.setTextColor(...textSlate); doc.text("Telefone Sec.:", col2, y);
+                doc.setTextColor(...textWhite); doc.text(dados.telefoneSec, col2 + 25, y);
+            }
+
+            y += 6;
+            doc.setTextColor(...textSlate); doc.text("E-mail:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.email, col1 + 15, y);
+
+            y += 12;
+
+            // SEÇÃO 3: ENDEREÇO
+            desenharSecao("3. Endereço Cadastral");
+
+            doc.setTextColor(...textSlate); doc.text("CEP:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.cep, col1 + 12, y);
+
+            doc.setTextColor(...textSlate); doc.text("Cidade / UF:", col2, y);
+            doc.setTextColor(...textWhite); doc.text(`${dados.cidade} / ${dados.uf}`, col2 + 24, y);
+
+            y += 6;
+            doc.setTextColor(...textSlate); doc.text("Logradouro:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(`${dados.rua}, nº ${dados.numero}`, col1 + 24, y);
+
+            y += 6;
+            doc.setTextColor(...textSlate); doc.text("Bairro:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.bairro, col1 + 15, y);
+
+            if (dados.complemento) {
+                doc.setTextColor(...textSlate); doc.text("Complemento:", col2, y);
+                doc.setTextColor(...textWhite); doc.text(dados.complemento, col2 + 26, y);
+            }
+
+            y += 12;
+
+            // SEÇÃO 4: OUTRAS INFORMAÇÕES
+            desenharSecao("4. Informações Adicionais");
+
+            doc.setTextColor(...textSlate); doc.text("Como conheceu a WA Assessoria:", col1, y);
+            doc.setTextColor(...textWhite); doc.text(dados.comoConheceu, col1 + 50, y);
+
+            if (dados.observacoes) {
+                y += 6;
+                doc.setTextColor(...textSlate); doc.text("Observações:", col1, y);
+                const splitObs = doc.splitTextToSize(dados.observacoes, 175);
+                doc.setTextColor(...textWhite);
+                doc.text(splitObs, col1, y + 5);
+                y += (splitObs.length * 4) + 2;
+            } else {
+                y += 6;
+            }
+
+            y += 10;
+
+            // SEÇÃO TERMOS & LGPD
+            doc.setFillColor(16, 22, 34);
+            doc.roundedRect(14, y, 182, 28, 2, 2, 'F');
+            doc.setDrawColor(...textGold);
+            doc.rect(14, y, 182, 28, 'S');
+
+            doc.setFontSize(7.5);
+            doc.setTextColor(...textGold);
+            doc.setFont("helvetica", "bold");
+            doc.text("CONFIRMAÇÃO DE TERMOS E PROTEÇÃO DE DADOS (LGPD)", 18, y + 6);
+
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...textSlate);
+            const termoTxt = "O cliente declara expressamente ter fornecido os dados acima com exatidão e autoriza a WA Assessoria a armazenar e processar suas informações pessoais exclusivamente para fins de cadastro, comunicação e execução dos atendimentos contratados, conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).";
+            const splitTermo = doc.splitTextToSize(termoTxt, 174);
+            doc.text(splitTermo, 18, y + 11);
+
+            // RODAPÉ AUTENTICIDADE
+            doc.setFontSize(8);
+            doc.setTextColor(...textSlate);
+            doc.text("WA Assessoria — Documento Oficial Gerado Digitalmente", 105, 285, { align: "center" });
+            doc.text("Página 1 de 1", 196, 285, { align: "right" });
+
+            // Salvar / Baixar o PDF
+            const nomeSanitizado = dados.nomeRazao.replace(/[^a-zA-Z0-9]/g, '_');
+            const nomeArquivo = `Ficha_Cadastro_${nomeSanitizado}.pdf`;
+            doc.save(nomeArquivo);
+
+            return nomeArquivo;
+        }
+
+        function formatarDataBR(dataISO) {
+            if (!dataISO) return '';
+            const partes = dataISO.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return dataISO;
+        }
+
+        /**
+         * PROCESSAMENTO GERAL DO ENVIO
+         */
+        async function processarEnvio() {
+            if (!validarFormulario()) {
+                // Rola suavemente até o primeiro erro
+                const primeiroErro = document.querySelector('.text-red-400:not(.hidden)');
+                if (primeiroErro) {
+                    primeiroErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btnSubmit');
+            const originalContent = btnSubmit.innerHTML;
+            
+            // Ativa loader visual no botão
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<div class="spinner border-navy-950 border-top-navy-950"></div> <span>Gerando PDF e Conectando...</span>`;
+
+            try {
+                // Coleta todos os dados do formulário
+                const dados = {
+                    tipoPessoa: tipoPessoa,
+                    nomeRazao: document.getElementById('nomeRazao').value.trim(),
+                    cpfCnpj: document.getElementById('cpfCnpj').value.trim(),
+                    dataNascAbertura: document.getElementById('dataNascAbertura').value,
+                    nomeFantasia: document.getElementById('nomeFantasia').value.trim(),
+                    repLegal: document.getElementById('repLegal').value.trim(),
+                    whatsapp: document.getElementById('whatsapp').value.trim(),
+                    telefoneSec: document.getElementById('telefoneSec').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    cep: document.getElementById('cep').value.trim(),
+                    uf: document.getElementById('uf').value,
+                    cidade: document.getElementById('cidade').value.trim(),
+                    bairro: document.getElementById('bairro').value.trim(),
+                    rua: document.getElementById('rua').value.trim(),
+                    numero: document.getElementById('numero').value.trim(),
+                    complemento: document.getElementById('complemento').value.trim(),
+                    comoConheceu: document.getElementById('comoConheceu').value,
+                    observacoes: document.getElementById('observacoes').value.trim()
+                };
+
+                // 1. Gerar e baixar PDF
+                const nomeArquivoPdf = await gerarPDF(dados);
+                pdfUltimoNomeArquivo = nomeArquivoPdf;
+
+                // 2. Montar mensagem formatada para o WhatsApp
+                const mensagemWa = 
+`Olá, *WA Assessoria*! 👋
+
+Acabei de preencher minha *Ficha Cadastral Digital* através do site.
+
+📌 *Resumo do Cadastro:*
+• *Nome/Razão:* ${dados.nomeRazao}
+• *${dados.tipoPessoa === 'PF' ? 'CPF' : 'CNPJ'}:* ${dados.cpfCnpj}
+• *WhatsApp:* ${dados.whatsapp}
+• *E-mail:* ${dados.email}
+• *Cidade/UF:* ${dados.cidade}/${dados.uf}
+
+📎 *Estou anexando o PDF gerado (${nomeArquivoPdf}) nesta conversa para conclusão do meu atendimento.*`;
+
+                pdfUltimaMensagemWa = mensagemWa;
+
+                // 3. Aguardar pequeno delay e abrir o WhatsApp
+                setTimeout(() => {
+                    abrirLinkWhatsApp(mensagemWa);
+                    exibirModalConfirmacao(nomeArquivoPdf);
+                    
+                    // Restaura o botão
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = originalContent;
+                }, 1000);
+
+                /**
+                 * NOTA DE ARQUITETURA PARA INTEGRAÇÃO COM WHATSAPP BUSINESS API:
+                 * Para automatizar completamente o envio do PDF via Webhook sem interação do cliente:
+                 * 1. Converter o PDF gerado em base64 com `doc.output('datauristring')`.
+                 * 2. Enviar um `fetch('https://sua-api-backend.com/api/send-pdf', { method: 'POST', body: ... })`.
+                 * 3. O backend dispara o documento diretamente via Meta Cloud API / WhatsApp Business API oficial.
+                 */
+
+            } catch (err) {
+                console.error("Erro na geração do PDF:", err);
+                alert("Ocorreu um erro ao gerar sua ficha em PDF. Por favor, tente novamente.");
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalContent;
+            }
+        }
+
+        function abrirLinkWhatsApp(mensagem) {
+            const urlEncoded = encodeURIComponent(mensagem);
+            const waUrl = `https://api.whatsapp.com/send?phone=${WA_GESTAO_NUMBER}&text=${urlEncoded}`;
+            window.open(waUrl, '_blank');
+        }
+
+        function reabrirWhatsApp() {
+            if (pdfUltimaMensagemWa) {
+                abrirLinkWhatsApp(pdfUltimaMensagemWa);
+            }
+        }
+
+        function exibirModalConfirmacao(nomeArquivo) {
+            document.getElementById('modalFileName').textContent = nomeArquivo;
+            document.getElementById('modalConfirmacao').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirmacao').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
